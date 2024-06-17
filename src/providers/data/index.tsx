@@ -20,7 +20,7 @@ export const client = new GraphQLClient(API_URL, {
     }
 })
 
-export const wsClient = typeof window !== "undefined"
+export const wsClient = typeof window !== "undefined" // Websocket for real time updates
     ? createClient({
         url: WS_URL,
         connectionParams: () => {
@@ -35,5 +35,5 @@ export const wsClient = typeof window !== "undefined"
     })
     : undefined
 
-export const dataProvider = graphqlDataProvider(client);
-export const liveProvider = wsClient ? graphqlLiveProvider(wsClient) : undefined;
+export const dataProvider = graphqlDataProvider(client); // API specific data provider
+export const liveProvider = wsClient ? graphqlLiveProvider(wsClient) : undefined; // API specific real time data provider
