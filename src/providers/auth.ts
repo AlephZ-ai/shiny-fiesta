@@ -1,154 +1,134 @@
-import { AuthProvider
- } from "@refinedev/core";
+import type { AuthProvider } from "@refinedev/core";
+
+import type { User } from "@/graphql/schema.types";
 
 import { API_URL, dataProvider } from "./data";
-import { AuthActionResponse } from "@refinedev/core/dist/contexts/auth/types";
 
-// For demo purposes, we will use the following credentials
+/**
+ * For demo purposes and to make it easier to test the app, you can use the following credentials:
+ */
 export const authCredentials = {
-    email: "michael.scott@dundermifflincom",
-    password: "demodemo"
+  email: "michael.scott@gmail.com",
+  password: "poop",
 };
 
 export const authProvider: AuthProvider = {
-    login: async (params: any): Promise<AuthActionResponse> => {
-      const { email } = params;
-      try {
-        // call the login mutation
-        // dataProvider.custom is used to make a custom request to the GraphQL API
-        // this will call dataProvider which will go through the fetchWrapper function
-        // we send only the email here as the password will be handled in the backend
-        const { data } = await dataProvider.custom({
-          url: API_URL,
-          method: "post",
-          headers: {},
-          meta: {
-            variables: { email },
-            // pass the email to see if the user exists and if so, return the accessToken
-            rawQuery: `
-              mutation Login($email: String!) {
-                login(loginInput: { email: $email }) {
-                  accessToken
-                }
-              }
-            `,
-          },
-        });
-        // save the accessToken in localStorage
-        localStorage.setItem("access_token", data.login.accessToken);
-        
-        return {
-            success: true,
-            redirectTo: "/",
-        };
-        } catch (e) {
-          const error = e as Error;
+  login: async ({ email }) => {
+    try {
+      const { data } = await dataProvider.custom({
+        url: API_URL,
+        method: "post",
+        headers: {},
+        meta: {
+          variables: { email },
+          rawQuery: `
+                mutation Login($email: String!) {
+                    login(loginInput: {
+                      email: $email
+                    }) {
+                      accessToken,
+                    }
+                  }
+                `,
+        },
+      });
 
-          return {
-            success: false,
-            error: {
-                message: "message" in error ? error.message : "Login failed",
-                name: "name" in error ? error.name : "Invalid email or password",
-            },
-          };
-        }
-    },
+      localStorage.setItem("access_token", data.login.accessToken);
+      console.log(data.login.accessToken);
 
-    logout: async (): Promise<AuthActionResponse> => {
-        localStorage.removeItem("access_token");
+      return {
+        success: true,
+        redirectTo: "/",
+      };
+    } catch (e) {
+      const error = e as Error;
 
-        return {
-            success: true,
-            redirectTo: "/login",
-        };
-    },
+      return {
+        success: false,
+        error: {
+          message: "message" in error ? error.message : "Login failed",
+          name: "name" in error ? error.name : "Invalid email or password",
+        },
+      };
+    }
+  },
+  logout: async () => {
+    localStorage.removeItem("access_token");
 
-    onError: async (error): Promise<AuthActionResponse> => {
-        // a check to see if the error is an authentication error
-        // if so, set logout to true
-        if (error.statusCode === "UNAUTHENTICATED") {
-            return {
-                logout: true,
-                ...error,
-                success: false,
-            };
-        }
+    return {
+      success: true,
+      redirectTo: "/login",
+    };
+  },
+  onError: async (error) => {
+    if (error.statusCode === "UNAUTHENTICATED") {
+      return {
+        logout: true,
+      };
+    }
 
-        return { error, success: false };
-},
-
-    check: async() => {
-        try {
-            // get the identity of the user
-            // this is to know if the user is authenticated
-            await dataProvider.custom({
-                url: API_URL,
-                method: "post",
-                headers: {},
-                meta: {
-                    rawQuery: `
-                      query Me {
+    return { error };
+  },
+  check: async () => {
+    try {
+      await dataProvider.custom({
+        url: API_URL,
+        method: "post",
+        headers: {},
+        meta: {
+          rawQuery: `
+                    query Me {
                         me {
                           name
                         }
                       }
-                    `,
-                },
-            });
+                `,
+        },
+      });
 
-            // if the user is authenticated, redirect to the home page
-            return {
-                authenticated: true,
-                success: true,
-                redirectTo: "/",
-            };
-        } catch (error) {
-            // for any other error, redirect to login page
-          return {
-            authenticated: false,
-            success: false,
-            redirectTo: "/login",
-            };
-        }
-    },
-    // get the user information
-    getIdentity: async () => {
-        const accessToken = localStorage.getItem("access_token");
-    
-        try {
-          // call the GraphQL API to get the user information
-          // we're using me:any because the GraphQL API doesn't have a type for the me query yet.
-          // we'll add some queries and mutations later and change this to User which will be generated by codegen.
-          const { data } = await dataProvider.custom<{ me: any }>({
-            url: API_URL,
-            method: "post",
-            headers: accessToken
-              ? {
-                  // send the accessToken in the Authorization header
-                  Authorization: `Bearer ${accessToken}`,
-                }
-              : {},
-            meta: {
-              // get the user information such as name, email, etc.
-              rawQuery: `
-                query Me {
-                  me {
-                    id
-                    name
-                    email
-                    phone
-                    jobTitle
-                    timezone
-                    avatarUrl
-                  }
-                }
-              `,
-            },
-          });
-    
-          return data.me;
-        } catch (error) {
-          return undefined;
-        }
-      },
-    };
+      return {
+        authenticated: true,
+        redirectTo: "/",
+      };
+    } catch (error) {
+      return {
+        authenticated: false,
+        redirectTo: "/login",
+      };
+    }
+  },
+  getIdentity: async () => {
+    const accessToken = localStorage.getItem("access_token");
+
+    try {
+      const { data } = await dataProvider.custom<{ me: User }>({
+        url: API_URL,
+        method: "post",
+        headers: accessToken
+          ? {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          : {},
+        meta: {
+          rawQuery: `
+                    query Me {
+                        me {
+                            id,
+                            name,
+                            email,
+                            phone,
+                            jobTitle,
+                            timezone
+                            avatarUrl
+                        }
+                      }
+                `,
+        },
+      });
+
+      return data.me;
+    } catch (error) {
+      return undefined;
+    }
+  },
+};
