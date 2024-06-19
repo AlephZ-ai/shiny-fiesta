@@ -2,7 +2,7 @@ import { GraphQLFormattedError } from "graphql";
 
 type Error = {
     message: string;
-    statusCode: string;
+    statusCode: string | number;
 }
 
 const fetchBody = async (url: string, options: RequestInit) => { //RequestInit is an interface that is used for the body of the fetch request
@@ -35,7 +35,7 @@ const getGraphQLErrors = (
     const errors = body?.errors;
     
     const messages = errors?.map((error) => error?.message)?.join(""); // The error messages will be joined together
-    const code = errors?.[0]?.extensions?.code; // The error code will be stored in the extensions of the error by accessing the first error in the array
+    const code = String(errors?.[0]?.extensions?.code); // The error code will be stored in the extensions of the error by accessing the first error in the array
 
     return {
         message: messages || JSON.stringify(errors), // If there are no messages, the errors will be stringified
