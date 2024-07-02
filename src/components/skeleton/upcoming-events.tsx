@@ -10,6 +10,8 @@ const UpcomingEventsSkeleton = () => {
             active
             style={{
               height: "14px",
+              position: "relative",
+              left: "-20px"
             }}
           />
         }
@@ -18,8 +20,10 @@ const UpcomingEventsSkeleton = () => {
             active
             style={{
               width: "250px",
-              marginTop: "8px",
+              marginTop: "10px",
               height: "16px",
+              position: "relative",
+              left: "-20px"
             }}
           />
         }

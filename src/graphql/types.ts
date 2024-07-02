@@ -64,8 +64,9 @@ export type DashboardTotalCountsQueryVariables = Types.Exact<{
 }>;
 
 export type DashboardTotalCountsQuery = {
-  events: Pick<Types.EventConnection, "totalCount">;
+  companies: Pick<Types.CompanyConnection, "totalCount">;
   contacts: Pick<Types.ContactConnection, "totalCount">;
+  deals: Pick<Types.DealConnection, "totalCount">;
 };
 
 export type DashboardCalendarUpcomingAppointmentsQueryVariables = Types.Exact<{

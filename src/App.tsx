@@ -23,6 +23,7 @@ import { Home, ForgotPassword, Login, Register } from "./pages";
 import { authProvider } from "./providers";
 import Layout from "./components/layout";
 import { resources } from "./config/resources";
+import List from "./pages/tasks/list";
 
 function App() {
   return (
@@ -62,6 +63,9 @@ function App() {
                   }
                 >
                   <Route path="/" index element={<Home />} /> {/* Renders the home and the outlet in the same area. This makes it a child */}
+                  <Route path="/tasks">
+                    <Route index element={<List />} />
+                  </Route> 
                 </Route>
               </Routes>
 

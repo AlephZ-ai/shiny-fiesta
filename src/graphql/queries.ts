@@ -3,10 +3,13 @@ import gql from "graphql-tag";
 // Query to get Total Appointment and Customer Counts
 export const DASHBOARD_TOTAL_COUNTS_QUERY = gql`
   query DashboardTotalCounts {
-    events {
+    companies {
       totalCount
     }
     contacts {
+      totalCount
+    }
+    deals {
       totalCount
     }
   }
@@ -24,6 +27,7 @@ export const DASHBOARD_CALENDAR_UPCOMING_APPOINTMENTS_QUERY = gql`
       nodes {
         id
         title
+        color
         startDate
         endDate
       }
