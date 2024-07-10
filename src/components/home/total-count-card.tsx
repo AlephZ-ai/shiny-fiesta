@@ -3,7 +3,6 @@ import { Card, Skeleton } from "antd";
 import React from "react";
 import { Text } from "../text";
 import { Area, AreaConfig } from "@ant-design/plots";
-import AreaChart from "@ant-design/plots/es/components/area";
 
 type Props = {
   resource: "companies" | "contacts" | "deals";
