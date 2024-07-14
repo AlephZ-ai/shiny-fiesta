@@ -24,6 +24,8 @@ import { authProvider } from "./providers";
 import Layout from "./components/layout";
 import { resources } from "./config/resources";
 import List from "./pages/tasks/list";
+import TasksCreatePage from "./pages/tasks/create";
+import TaskEditPage from "./pages/tasks/edit";
 
 function App() {
   return (
@@ -63,9 +65,13 @@ function App() {
                   }
                 >
                   <Route path="/" index element={<Home />} /> {/* Renders the home and the outlet in the same area. This makes it a child */}
-                  <Route path="/tasks">
-                    <Route index element={<List />} />
-                  </Route> 
+                  <Route path="/tasks" element={
+                    <List>
+                      <Outlet />
+                    </List>}>
+                    <Route path="new" element={<TasksCreatePage />} />
+                    <Route path="edit/:id" element={<TaskEditPage />} />
+                  </Route>
                 </Route>
               </Routes>
 

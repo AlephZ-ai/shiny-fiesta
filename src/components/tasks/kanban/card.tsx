@@ -9,6 +9,7 @@ import {
   EyeOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
+import { useDelete, useNavigation } from "@refinedev/core";
 import {
   Button,
   Card,
@@ -38,7 +39,9 @@ type ProjectCardProps = {
 const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
   const { token } = theme.useToken();
 
-  const edit = () => {};
+  const { edit } = useNavigation();
+
+  const { mutate: del } = useDelete();
 
   const dropdownItems = useMemo(() => {
     const dropdownItems: MenuProps["items"] = [
@@ -47,8 +50,7 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
         key: "1",
         icon: <EyeOutlined />,
         onClick: () => {
-          edit();
-          
+          edit("tasks", id, "replace");
         },
       },
       {
@@ -56,7 +58,15 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
         label: "Delete card",
         icon: <DeleteOutlined />,
         key: "2",
-        onClick: () => {},
+        onClick: () => {
+          del({
+            resource: "tasks",
+            id,
+            meta: {
+              operation: "task",
+            },
+          });
+        },
       },
     ];
 
@@ -89,12 +99,18 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
     >
       <Card
         size="small"
-        title={<Text ellipsis={{ tooltip: title }}>{title}</Text>}
-        onClick={() => edit()}
+        title={title.length > 35 ? (<Text ellipsis={{ tooltip: title }}>{title.slice(0, 35) + '...'}</Text>) : (
+          <Text>{title}</Text>
+        )}
+        onClick={() => edit("tasks", id, "replace")}
         extra={
           <Dropdown
             trigger={["click"]}
-            menu={{ items: dropdownItems, onPointerDown: (e) => e.stopPropagation(), onClick: (e) => e.domEvent.stopPropagation() }}
+            menu={{
+              items: dropdownItems,
+              onPointerDown: (e) => e.stopPropagation(),
+              onClick: (e) => e.domEvent.stopPropagation(),
+            }}
             placement="bottom"
             arrow={{ pointAtCenter: true }}
           >
@@ -134,16 +150,27 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
               color={dueDateOptions.color}
               bordered={dueDateOptions.color !== "default"}
             >
-                {dueDateOptions.text}
+              {dueDateOptions.text}
             </Tag>
           )}
           {!!users?.length && (
-            <Space size={4} wrap direction='horizontal' align='center' style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto', marginRight: '0'}}>
-                {users.map((user) => (
-                    <Tooltip key={user.id} title={user.name}>
-                        <CustomAvatar name={user.name} src={user.avatarUrl} />
-                    </Tooltip>
-                ))}
+            <Space
+              size={4}
+              wrap
+              direction="horizontal"
+              align="center"
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                marginLeft: "auto",
+                marginRight: "0",
+              }}
+            >
+              {users.map((user) => (
+                <Tooltip key={user.id} title={user.name}>
+                  <CustomAvatar name={user.name} src={user.avatarUrl} />
+                </Tooltip>
+              ))}
             </Space>
           )}
         </div>
@@ -155,11 +182,11 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
 export default ProjectCard;
 
 export const ProjectCardMemo = memo(ProjectCard, (prev, next) => {
-    return (
-        prev.id === next.id &&
-        prev.title === next.title &&
-        prev.updatedAt === next.updatedAt &&
-        prev.dueDate === next.dueDate &&
-        prev.users?.length === next.users?.length
-    )
+  return (
+    prev.id === next.id &&
+    prev.title === next.title &&
+    prev.updatedAt === next.updatedAt &&
+    prev.dueDate === next.dueDate &&
+    prev.users?.length === next.users?.length
+  );
 });

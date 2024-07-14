@@ -59,6 +59,37 @@ export type UpdateAppointmentChecklistMutation = {
   };
 };
 
+export type UpdateTaskStageMutationVariables = Types.Exact<{
+  input: Types.UpdateOneTaskInput;
+}>;
+
+export type UpdateTaskStageMutation = { updateOneTask: Pick<Types.Task, "id"> };
+
+export type UpdateTaskMutationVariables = Types.Exact<{
+  input: Types.UpdateOneTaskInput;
+}>;
+
+export type UpdateTaskMutation = {
+  updateOneTask: Pick<
+    Types.Task,
+    "id" | "title" | "completed" | "description" | "dueDate"
+  > & {
+    stage?: Types.Maybe<Pick<Types.TaskStage, "id" | "title">>;
+    users: Array<Pick<Types.User, "id" | "name" | "avatarUrl">>;
+    checklist: Array<Pick<Types.CheckListItem, "title" | "checked">>;
+  };
+};
+
+export type CreateTaskMutationVariables = Types.Exact<{
+  input: Types.CreateOneTaskInput;
+}>;
+
+export type CreateTaskMutation = {
+  createOneTask: Pick<Types.Task, "id" | "title"> & {
+    stage?: Types.Maybe<Pick<Types.TaskStage, "id" | "title">>;
+  };
+};
+
 export type DashboardTotalCountsQueryVariables = Types.Exact<{
   [key: string]: never;
 }>;
@@ -77,7 +108,9 @@ export type DashboardCalendarUpcomingAppointmentsQueryVariables = Types.Exact<{
 
 export type DashboardCalendarUpcomingAppointmentsQuery = {
   events: Pick<Types.EventConnection, "totalCount"> & {
-    nodes: Array<Pick<Types.Event, "id" | "title" | "startDate" | "endDate">>;
+    nodes: Array<
+      Pick<Types.Event, "id" | "title" | "color" | "startDate" | "endDate">
+    >;
   };
 };
 
@@ -214,6 +247,30 @@ export type AppointmentStagesSelectQueryVariables = Types.Exact<{
 }>;
 
 export type AppointmentStagesSelectQuery = {
+  taskStages: Pick<Types.TaskStageConnection, "totalCount"> & {
+    nodes: Array<Pick<Types.TaskStage, "id" | "title">>;
+  };
+};
+
+export type UsersSelectQueryVariables = Types.Exact<{
+  filter: Types.UserFilter;
+  sorting?: Types.InputMaybe<Array<Types.UserSort> | Types.UserSort>;
+  paging: Types.OffsetPaging;
+}>;
+
+export type UsersSelectQuery = {
+  users: Pick<Types.UserConnection, "totalCount"> & {
+    nodes: Array<Pick<Types.User, "id" | "name" | "avatarUrl">>;
+  };
+};
+
+export type TaskStagesSelectQueryVariables = Types.Exact<{
+  filter: Types.TaskStageFilter;
+  sorting?: Types.InputMaybe<Array<Types.TaskStageSort> | Types.TaskStageSort>;
+  paging: Types.OffsetPaging;
+}>;
+
+export type TaskStagesSelectQuery = {
   taskStages: Pick<Types.TaskStageConnection, "totalCount"> & {
     nodes: Array<Pick<Types.TaskStage, "id" | "title">>;
   };

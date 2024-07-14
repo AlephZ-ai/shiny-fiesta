@@ -4,12 +4,12 @@ import { KanbanBoardContainer, KanbanBoard } from '@/components/tasks/kanban/boa
 import ProjectCard, { ProjectCardMemo } from '@/components/tasks/kanban/card'
 import KanbanColumn from '@/components/tasks/kanban/column'
 import KanbanItem from '@/components/tasks/kanban/item'
-import { UPDATE_APPOINTMENT_STAGE_MUTATION } from '@/graphql/mutations'
+import { UPDATE_APPOINTMENT_STAGE_MUTATION, UPDATE_TASK_STAGE_MUTATION } from '@/graphql/mutations'
 import { APPOINTMENTS_QUERY, APPOINTMENT_STAGES_SELECT_QUERY } from '@/graphql/queries'
 import { TaskStage } from '@/graphql/schema.types'
 import { AppointmentsQuery } from '@/graphql/types'
 import { DragEndEvent } from '@dnd-kit/core'
-import { useList, useUpdate } from '@refinedev/core'
+import { useList, useNavigation, useUpdate } from '@refinedev/core'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
 import React from 'react'
 
@@ -64,8 +64,12 @@ const List = ({ children }: React.PropsWithChildren) => {
     }, [tasks, stages])
 
 
+    const { replace } = useNavigation();
+
     const handleAddCard = (args: { stageId: string }) => {
-        console.log('Add card', args)
+        const path = args.stageId === 'unassigned' ? '/tasks/new' : `/tasks/new?stageId=${args.stageId}`
+
+        replace(path)
     }
 
     const isLoading = isLoadingTasks || isLoadingStages
@@ -78,6 +82,8 @@ const List = ({ children }: React.PropsWithChildren) => {
         let stageId = event.over?.id as undefined | string | null
         const taskId = event.active.id as string
         const taskStageId = event.active.data.current?.stageId
+
+        console.log(stageId, taskId, taskStageId)
 
         if (taskStageId === stageId) return
 
@@ -94,7 +100,7 @@ const List = ({ children }: React.PropsWithChildren) => {
             successNotification: false,
             mutationMode: 'optimistic',
             meta: {
-                gqlMutation: UPDATE_APPOINTMENT_STAGE_MUTATION
+                gqlMutation: UPDATE_TASK_STAGE_MUTATION
             }
         })
     }

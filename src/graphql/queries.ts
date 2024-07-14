@@ -219,3 +219,38 @@ export const APPOINTMENT_STAGES_SELECT_QUERY = gql`
     }
   }
 `;
+
+export const USERS_SELECT_QUERY = gql`
+  query UsersSelect(
+    $filter: UserFilter!
+    $sorting: [UserSort!]
+    $paging: OffsetPaging!
+  ) {
+    # Get all users
+    users(filter: $filter, sorting: $sorting, paging: $paging) {
+      totalCount # Get the total count of users
+      # Get specific fields for each user
+      nodes {
+        id
+        name
+        avatarUrl
+      }
+    }
+  }
+`;
+
+export const TASK_STAGES_SELECT_QUERY = gql`
+  query TaskStagesSelect(
+    $filter: TaskStageFilter!
+    $sorting: [TaskStageSort!]
+    $paging: OffsetPaging!
+  ) {
+    taskStages(filter: $filter, sorting: $sorting, paging: $paging) {
+      totalCount
+      nodes {
+        id
+        title
+      }
+    }
+  }
+`;

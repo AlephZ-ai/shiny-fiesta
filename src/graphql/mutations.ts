@@ -72,3 +72,49 @@ export const UPDATE_APPOINTMENT_CHECKLIST_MUTATION = gql`
     }
   }
 `;
+
+export const UPDATE_TASK_STAGE_MUTATION = gql`
+  mutation UpdateTaskStage($input: UpdateOneTaskInput!) {
+    updateOneTask(input: $input) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_TASK_MUTATION = gql`
+  mutation UpdateTask($input: UpdateOneTaskInput!) {
+    updateOneTask(input: $input) {
+      id
+      title
+      completed
+      description
+      dueDate
+      stage {
+        id
+        title
+      }
+      users {
+        id
+        name
+        avatarUrl
+      }
+      checklist {
+        title
+        checked
+      }
+    }
+  }
+`;
+
+export const CREATE_TASK_MUTATION = gql`
+  mutation CreateTask($input: CreateOneTaskInput!) {
+    createOneTask(input: $input) {
+      id
+      title
+      stage {
+        id
+        title
+      }
+    }
+  }
+`;

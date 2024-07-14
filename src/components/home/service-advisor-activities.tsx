@@ -52,7 +52,7 @@ const ServiceAdvisorActivities = () => {
                 <LatestActivitiesSkeleton key={index} />
             )}/>
         ) : (
-            <List itemLayout='horizontal' dataSource={audit?.data} renderItem={(item) => {const deal = deals?.data.find((deal) => deal.id == item.targetId) || undefined;
+            <List itemLayout='horizontal' dataSource={audit?.data.slice(0, 5)} renderItem={(item) => {const deal = deals?.data.find((deal) => deal.id == item.targetId) || undefined;
 
                 return (
                     <List.Item>
